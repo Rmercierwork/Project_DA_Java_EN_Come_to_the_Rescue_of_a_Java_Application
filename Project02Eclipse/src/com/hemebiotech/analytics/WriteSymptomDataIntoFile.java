@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * This implementation is used to read data from specific file
+ */
 public class WriteSymptomDataIntoFile implements ISymptomWriter {
 
     private final String filePathOut;

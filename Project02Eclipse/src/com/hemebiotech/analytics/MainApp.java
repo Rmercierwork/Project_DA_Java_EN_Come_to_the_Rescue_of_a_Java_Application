@@ -2,6 +2,9 @@ package com.hemebiotech.analytics;
 
 import java.util.LinkedHashMap;
 
+/**
+ * Initialise programme
+ */
 public class MainApp {
     public static void main(String[] args) {
 

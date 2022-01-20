@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * Business class used to handle symptoms list, map.
+ */
 public class AnalyticsCounter {
 
 	private final ISymptomReader symptomReader;

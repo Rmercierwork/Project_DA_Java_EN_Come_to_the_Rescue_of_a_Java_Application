@@ -1,43 +1,55 @@
 package com.hemebiotech.analytics;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class AnalyticsCounter {
-	private static int headacheCount = 0;	// initialize to 0
-	private static int rashCount = 0;		// initialize to 0
-	private static int pupilCount = 0;		// initialize to 0
-	
-	public static void main(String args[]) throws Exception {
-		// first get input
-		BufferedReader reader = new BufferedReader (new FileReader("symptoms.txt"));
-		String line = reader.readLine();
 
-		int i = 0;	// set i to 0
-		int headCount = 0;	// counts headaches
-		while (line != null) {
-			i++;	// increment i
-			System.out.println("symptom from file: " + line);
-			if (line.equals("headache")) {
-				headCount++;
-				System.out.println("number of headaches: " + headCount);
-			}
-			else if (line.equals("rush")) {
-				rashCount++;
-			}
-			else if (line.contains("pupils")) {
-				pupilCount++;
-			}
+	private final ISymptomReader symptomReader;
+	private final ISymptomWriter symptomWriter;
+	private List<String> listSymptoms;
+	private LinkedHashMap<String, Long> symptomsMap;
 
-			line = reader.readLine();	// get another symptom
+	public AnalyticsCounter(ISymptomReader symptomReader, ISymptomWriter symptomWriter, LinkedHashMap<String, Long> symptomsMap) {
+		this.symptomReader = symptomReader;
+		this.symptomWriter = symptomWriter;
+		this.symptomsMap = symptomsMap;
+	}
+	/**
+	 * Generate a list of Symptoms from a file
+	 */
+	public void getListSymptoms() {
+		this.listSymptoms = symptomReader.GetSymptoms();
+	}
+
+	/**
+	 * Generate a file from a map
+	 */
+	public void setFileResult() {
+		this.symptomWriter.setSymptoms(this.symptomsMap);
+	}
+
+	/**
+	 * Generate a map of unique symptom as Key, and the occurrence as Value from a list
+	 */
+	public void setHashMapCounterSymptoms() {
+		List<Map.Entry<String, Long>> toSort = new ArrayList<>();
+		for (Map.Entry<String, Long> stringLongEntry : listSymptoms.stream()
+				.collect(Collectors.groupingBy(Function.identity(),
+						Collectors.counting()))
+				.entrySet()) {
+			toSort.add(stringLongEntry);
 		}
-		
-		// next generate output
-		FileWriter writer = new FileWriter ("result.out");
-		writer.write("headache: " + headacheCount + "\n");
-		writer.write("rash: " + rashCount + "\n");
-		writer.write("dialated pupils: " + pupilCount + "\n");
-		writer.close();
+		toSort.sort(Map.Entry.comparingByKey());
+		var listedSymptom =
+				new LinkedHashMap<String, Long>();
+		for (Map.Entry<String, Long> stringLongEntry : toSort) {
+			listedSymptom.putIfAbsent(stringLongEntry.getKey(), stringLongEntry.getValue());
+		}
+		this.symptomsMap=listedSymptom;
 	}
 }
